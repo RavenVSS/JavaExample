@@ -3,9 +3,10 @@ class App {
         MyStack<Integer> stack = new MyStack<Integer>();
         stack.Push(10);
         stack.Push(11);
-        System.out.println("Test: " + stack.Pop());
-        System.out.println("Test: " + stack.Pop());
-        System.out.println("Test: " + stack.Pop());
+        stack.Push(12);
+        System.out.println("Test 1: " + stack.Pop());
+        System.out.println("Test 2: " + stack.Peek());
+        System.out.println("Test 3: " + stack.Pop());
     }
 }
 
@@ -39,9 +40,9 @@ class MyStack<T> {
     }
 
     T Pop() {
-        Object result = this.top!=null ? top.Peek() : 0;
+        Object result = this.top == null ? null : top.Peek();
 
-        if (!top.First()) {
+        if (this.top != null && !top.First()) {
             top = top.prevItem;
         } else top = null;
 
