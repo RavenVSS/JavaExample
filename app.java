@@ -3,55 +3,55 @@ import java.util.*;
 class App {
     public static void main(String[] args) {
         MyStack<Integer> stack = new MyStack<Integer>();
-        stack.Push(40);
-        stack.Push(1);
-        stack.Push(0);
-        stack.Push(30);
-        stack.Push(5);
-        System.out.println("Test 1: " + stack.Pop());
-        System.out.println("Test 2: " + stack.Peek());
-        System.out.println("Max: " + stack.Max());
-        System.out.println("Min: " + stack.Min());
+        stack.push(40);
+        stack.push(1);
+        stack.push(0);
+        stack.push(30);
+        stack.push(5);
+        System.out.println("Test 1: " + stack.pop());
+        System.out.println("Test 2: " + stack.peek());
+        System.out.println("Max: " + stack.max());
+        System.out.println("Min: " + stack.min());
     }
 }
 
 class MyStack<T extends Comparable<T>> {
-    Item top;
-    Item max;
-    Item min;
+    private Item<T> top;
+    private Item<T> max;
+    private Item<T> min;
 
-    class Item<U extends Comparable<U>> implements Comparable<Item<U>> {
-        U currentItem;
-        Item prevItem;
+    private class Item<U extends Comparable<U>> implements Comparable<Item<U>> {
+        private U currentItem;
+        private Item<T> prevItem;
 
-        public Item(U currentItem, Item prevItem) {
+        public Item(U currentItem, Item<T> prevItem) {
             this.currentItem = currentItem;
             this.prevItem = prevItem;
         }
 
-        public U Peek() {
+        public U peek() {
             return this.currentItem;
         }
 
-        public boolean First() {
+        public boolean first() {
             return this.prevItem == null;
         }
 
         @Override
         public int compareTo(Item<U> item)
         {
-            int result = this.Peek().compareTo(item.Peek());
+            int result = this.peek().compareTo(item.peek());
             return result;
         }
 
-        public static <U extends Comparable<U>> U max(U x, U y) {
+        protected static <U extends Comparable<U>> U max(U x, U y) {
             if (x.compareTo(y) > 0) {
                 return x;
             }
             return y;
         }
 
-        public static <U extends Comparable<U>> U min(U x, U y) {
+        protected static <U extends Comparable<U>> U min(U x, U y) {
             if (x.compareTo(y) < 0) {
                 return x;
             }
@@ -65,7 +65,7 @@ class MyStack<T extends Comparable<T>> {
         this.min = null;
     }
 
-    void Push(T obj) {
+    void push(T obj) {
         this.top = new Item(obj, this.top);
 
         if (this.max == null) this.max = this.top;
@@ -75,25 +75,25 @@ class MyStack<T extends Comparable<T>> {
         this.min = Item.min(this.min, this.top);
     }
 
-    T Pop() {
-        T result = this.top == null ? null : (T)top.Peek();
+    T pop() {
+        T result = this.top == null ? null : top.peek();
 
-        if (this.top != null && !top.First()) {
+        if (this.top != null && !top.first()) {
             top = top.prevItem;
         } else top = null;
 
-        return (T)result;
+        return result;
     }
 
-    T Peek() {
-        return (T)top.Peek();
+    T peek() {
+        return top.peek();
     }
 
-    T Max() {
-        return (T)max.Peek();
+    T max() {
+        return max.peek();
     }
 
-    T Min() {
-        return (T)min.Peek();
+    T min() {
+        return min.peek();
     }
 }
