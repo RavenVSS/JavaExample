@@ -96,10 +96,14 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
         this.min = Item.min(this.min, this.top);
     }
 
-    private void checkMinMax(Item<T> top) {
-        this.max = Item.max(this.max, top);
+    private void checkMin(Item<T> top) {
         this.min = Item.min(this.min, top);
-        if (!top.first()) checkMinMax(top.getPrev());
+        if (!top.first()) checkMin(top.getPrev());
+    }
+
+    private void checkMax(Item<T> top) {
+        this.max = Item.max(this.max, top);
+        if (!top.first()) checkMax(top.getPrev());
     }
 
     /* Возвращает ссылку на верхний объект стека с последующим удалением объекта из стека */
@@ -110,10 +114,15 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
             Item<T> item = obj.get();
             result = Optional.ofNullable(item.peek());
             if (!item.first()) {
+                if (this.top == this.min) {
+                    this.min = item.getPrev();
+                    checkMin(item.getPrev());
+                }
+                if (this.top == this.max) {
+                    this.max = item.getPrev();
+                    checkMax(item.getPrev());
+                }
                 this.top = item.getPrev();
-                this.max = this.top;
-                this.min = this.top;
-                checkMinMax(this.top);
             } else this.top = null;
         }
         return result;
