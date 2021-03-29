@@ -10,13 +10,12 @@ class App {
         new MyStack<Integer>().min();
         MyStack<Integer> stack = new MyStack<Integer>();
         stack.push(20);
-        stack.push(1);
+        stack.push(0);
         stack.push(5);
         stack.push(30);
         stack.push(0);
-        System.out.println("Test pop 1: " + stack.pop().get());
-        System.out.println("Test pop 2: " + stack.pop().get());
-        System.out.println("Test peek 3: " + stack.peek().get());
+        System.out.println("Test pop: " + stack.pop().get());
+        System.out.println("Test peek: " + stack.peek().get());
         System.out.println("Max: " + stack.max().get());
         System.out.println("Min: " + stack.min().get());
     }
@@ -37,13 +36,15 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
 
     private class Item<U extends Comparable<U>> implements Comparable<Item<U>> {
         private U currentItem;
-        private Item<T> prevItem;
+        private Item<U> prevItem;
+        private Item<U> prevMax;
+        private Item<U> prevMin;
 
         public Item() {
 
         }
 
-        public Item(U currentItem, Item<T> prevItem) {
+        public Item(U currentItem, Item<U> prevItem) {
             this.currentItem = currentItem;
             this.prevItem = prevItem;
         }
@@ -52,10 +53,17 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
             return this.currentItem;
         }
 
-        protected Item<T> getPrev() {
+        protected Item<U> getPrev() {
             return this.prevItem;
         }
 
+        protected Item<U> getPrevMax() {
+            return this.prevMax;
+        }
+
+        protected Item<U> getPrevMin() {
+            return this.prevMin;
+        }
 
         protected boolean first() {
             return this.prevItem == null;
@@ -67,20 +75,24 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
             return result;
         }
 
-        protected static <U extends Comparable<U>> U max(U x, U y) {
-            if (x == null) x = y;
-            if (x.compareTo(y) > 0) {
+        protected Item<U> max(Item<U> x) {
+            if (x == null) x = this;
+            if (x.compareTo(this) > 0) {
                 return x;
+            } else {
+                this.prevMax = x;
+                return this;
             }
-            return y;
         }
 
-        protected static <U extends Comparable<U>> U min(U x, U y) {
-            if (x == null) x = y;
-            if (x.compareTo(y) < 0) {
+        protected Item<U> min(Item<U> x) {
+            if (x == null) x = this;
+            if (x.compareTo(this) < 0) {
                 return x;
+            } else {
+                this.prevMin = x;
+                return this;
             }
-            return y;
         }
     }
 
@@ -92,18 +104,8 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
     public void push(T obj) {
         this.top = new Item<T>(obj, this.top);
 
-        this.max = Item.max(this.max, this.top);
-        this.min = Item.min(this.min, this.top);
-    }
-
-    private void checkMin(Item<T> top) {
-        this.min = Item.min(this.min, top);
-        if (!top.first()) checkMin(top.getPrev());
-    }
-
-    private void checkMax(Item<T> top) {
-        this.max = Item.max(this.max, top);
-        if (!top.first()) checkMax(top.getPrev());
+        this.max = this.top.max(this.max);
+        this.min = this.top.min(this.min);
     }
 
     /* Возвращает ссылку на верхний объект стека с последующим удалением объекта из стека */
@@ -114,13 +116,11 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
             Item<T> item = obj.get();
             result = Optional.ofNullable(item.peek());
             if (!item.first()) {
-                if (this.top == this.min) {
-                    this.min = item.getPrev();
-                    checkMin(item.getPrev());
+                if (item.getPrevMax() != null) {
+                    this.max = item.getPrevMax();
                 }
-                if (this.top == this.max) {
-                    this.max = item.getPrev();
-                    checkMax(item.getPrev());
+                if (item.getPrevMin() != null) {
+                    this.min = item.getPrevMin();
                 }
                 this.top = item.getPrev();
             } else this.top = null;
@@ -132,7 +132,7 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
     public Optional<T> peek() {
         Optional<Item<T>> optional = Optional.ofNullable(this.top);
         if(optional.isPresent())
-                return Optional.ofNullable(optional.get().peek());
+            return Optional.ofNullable(optional.get().peek());
         return Optional.empty();
     }
 
@@ -140,7 +140,7 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
     public Optional<T> max() {
         Optional<Item<T>> optional = Optional.ofNullable(this.max);
         if(optional.isPresent())
-                return Optional.ofNullable(optional.get().peek());
+            return Optional.ofNullable(optional.get().peek());
         return Optional.empty();
     }
 
@@ -148,7 +148,7 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
     public Optional<T> min() {
         Optional<Item<T>> optional = Optional.ofNullable(this.min);
         if(optional.isPresent())
-                return Optional.ofNullable(optional.get().peek());
+            return Optional.ofNullable(optional.get().peek());
         return Optional.empty();
     }
 }
