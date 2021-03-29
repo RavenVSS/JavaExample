@@ -123,7 +123,11 @@ class MyStack<T extends Comparable<T>> implements Stack<T> {
                     this.min = item.getPrevMin();
                 }
                 this.top = item.getPrev();
-            } else this.top = null;
+            } else {
+                this.top = null;
+                this.min = null;
+                this.max = null;
+            } 
         }
         return result;
     }
